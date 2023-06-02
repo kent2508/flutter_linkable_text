@@ -1,7 +1,7 @@
 name: flutter_linkable_text
 description: A new Flutter package project.
 version: 1.0.0
-homepage:
+homepage: https://github.com/kent2508/flutter_linkable_text
 
 environment:
   sdk: '>=2.19.5 <3.0.0'
