@@ -11,24 +11,25 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/developing-packages).
 -->
 
-TODO: Convert a normal Text widget to RichText widget, change the color of links, email addresses, phone numbers to blue and add a tap gesture to them.
+Convert a normal Text widget to RichText widget, change the color of links, email addresses, phone numbers to blue and add a tap gesture to them.
 
 ## Usage
 
-TODO: add package to `pubspec.yaml` file.
+Add package to `pubspec.yaml` file.
 
 ```dart
 dependencies:
   flutter_linkable_text: ^latest
 ```
 
-TODO: import package to code file.
+Import package to code file.
 
 ```dart
 import 'package:flutter_linkable_text/flutter_linkable_text.dart';
 ```
 
 ## Example
+Use as a normal widget:
 
 ```dart
 Container(
