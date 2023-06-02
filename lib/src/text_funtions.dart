@@ -19,20 +19,37 @@ class FLTTextFunctions {
   }
 
   static Widget convertToRichText(String inputText,
-      {TextStyle? customBaseTextStyle}) {
+      {TextStyle? customBaseTextStyle, Function(String)? onEmail}) {
     final baseTextStyle = customBaseTextStyle ?? _baseStyle;
     List<String> words = inputText.split(' ');
     List<TextSpan> textSpans = [];
+    String lastChar = '';
     for (var word in words) {
+      if (word.endsWith('.') ||
+          word.endsWith(',') ||
+          word.endsWith('!') ||
+          word.endsWith('?')) {
+        lastChar = word[word.length - 1];
+        word = word.substring(0, word.length - 1);
+      } else {
+        lastChar = '';
+      }
       if (EmailValidator(errorText: 'not email').isValid(word)) {
         textSpans.add(
           TextSpan(
-            text: '$word ',
+            text: word,
             style: baseTextStyle.copyWith(color: Colors.blue),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 Pasteboard.writeText(word);
+                onEmail?.call(word);
               },
+          ),
+        );
+        textSpans.add(
+          TextSpan(
+            text: lastChar.isNotEmpty ? '$lastChar ' : ' ',
+            style: baseTextStyle,
           ),
         );
         continue;
@@ -40,7 +57,7 @@ class FLTTextFunctions {
       if (word.startsWith('http://') || word.startsWith('https://')) {
         textSpans.add(
           TextSpan(
-            text: '$word ',
+            text: word,
             style: baseTextStyle.copyWith(
               color: Colors.blue,
               decoration: TextDecoration.underline,
@@ -51,13 +68,19 @@ class FLTTextFunctions {
               },
           ),
         );
+        textSpans.add(
+          TextSpan(
+            text: lastChar.isNotEmpty ? '$lastChar ' : ' ',
+            style: baseTextStyle,
+          ),
+        );
         continue;
       }
       if (word.startsWith('0') &&
           NumberOnlyValidator(errorText: '').isValid(word)) {
         textSpans.add(
           TextSpan(
-            text: '$word ',
+            text: word,
             style: baseTextStyle.copyWith(color: Colors.blue),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
@@ -65,9 +88,15 @@ class FLTTextFunctions {
               },
           ),
         );
+        textSpans.add(
+          TextSpan(
+            text: lastChar.isNotEmpty ? '$lastChar ' : ' ',
+            style: baseTextStyle,
+          ),
+        );
         continue;
       }
-      textSpans.add(TextSpan(text: '$word ', style: baseTextStyle));
+      textSpans.add(TextSpan(text: '$word$lastChar ', style: baseTextStyle));
     }
     return RichText(text: TextSpan(children: textSpans));
   }
