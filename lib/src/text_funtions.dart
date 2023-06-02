@@ -18,7 +18,7 @@ class FLTTextFunctions {
     }
   }
 
-  static Widget convertToRichText(BuildContext context, String inputText,
+  static Widget convertToRichText(String inputText,
       {TextStyle? customBaseTextStyle}) {
     final baseTextStyle = customBaseTextStyle ?? _baseStyle;
     List<String> words = inputText.split(' ');
