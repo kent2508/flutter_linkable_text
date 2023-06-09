@@ -49,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
               'This text below has links, phone numbers and email addresses:',
             ),
             FLTTextFunctions.convertToRichText(
-                'Hello, we come from https://luckystars.com, with hotline 02241554111. You got an award from our marketing campain. So, please send your information to email award_here@fakemail.com. Goodbye.',
+                'Hello, we come from https://luckystars.com, with hotline 02241554111. You got an award from our marketing campain. So, please send your information to email award_here@fakemail.com.\nGoodbye.',
                 onEmail: (email) {
               EasyLoading.showToast(email);
             }),

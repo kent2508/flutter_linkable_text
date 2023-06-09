@@ -18,85 +18,97 @@ class FLTTextFunctions {
     }
   }
 
+  static void _separate(
+      String inputString, String lastString, Function(String, String) result) {
+    if (inputString.endsWith('.') ||
+        inputString.endsWith(',') ||
+        inputString.endsWith('!') ||
+        inputString.endsWith('?')) {
+      final lastStr = inputString[inputString.length - 1];
+      final cutStr = inputString.substring(0, inputString.length - 1);
+      _separate(cutStr, '$lastString$lastStr', result);
+    } else {
+      result(inputString, lastString);
+    }
+  }
+
   static Widget convertToRichText(String inputText,
       {TextStyle? customBaseTextStyle, Function(String)? onEmail}) {
     final baseTextStyle = customBaseTextStyle ?? _baseStyle;
-    List<String> words = inputText.split(' ');
+    List<String> paragraphs = inputText.split('\n');
     List<TextSpan> textSpans = [];
-    String lastChar = '';
-    for (var word in words) {
-      if (word.endsWith('.') ||
-          word.endsWith(',') ||
-          word.endsWith('!') ||
-          word.endsWith('?')) {
-        lastChar = word[word.length - 1];
-        word = word.substring(0, word.length - 1);
-      } else {
-        lastChar = '';
+    for (var paragraph in paragraphs) {
+      List<String> words = paragraph.split(' ');
+      for (var word in words) {
+        String lastChar = '';
+        _separate(word, lastChar, (p0, p1) {
+          word = p0;
+          lastChar = p1;
+          if (EmailValidator(errorText: 'not email').isValid(word)) {
+            textSpans.add(
+              TextSpan(
+                text: word,
+                style: baseTextStyle.copyWith(color: Colors.blue),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    Pasteboard.writeText(word);
+                    onEmail?.call(word);
+                  },
+              ),
+            );
+            textSpans.add(
+              TextSpan(
+                text: lastChar.isNotEmpty ? '$lastChar ' : ' ',
+                style: baseTextStyle,
+              ),
+            );
+          } else if (word.startsWith('http://') ||
+              word.startsWith('https://')) {
+            textSpans.add(
+              TextSpan(
+                text: word,
+                style: baseTextStyle.copyWith(
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    tryToLaunchUrl(word);
+                  },
+              ),
+            );
+            textSpans.add(
+              TextSpan(
+                text: lastChar.isNotEmpty ? '$lastChar ' : ' ',
+                style: baseTextStyle,
+              ),
+            );
+          } else if (word.startsWith('0') &&
+              NumberOnlyValidator(errorText: '').isValid(word)) {
+            textSpans.add(
+              TextSpan(
+                text: word,
+                style: baseTextStyle.copyWith(color: Colors.blue),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    tryToLaunchUrl(word);
+                  },
+              ),
+            );
+            textSpans.add(
+              TextSpan(
+                text: lastChar.isNotEmpty ? '$lastChar ' : ' ',
+                style: baseTextStyle,
+              ),
+            );
+          } else {
+            textSpans
+                .add(TextSpan(text: '$word$lastChar ', style: baseTextStyle));
+          }
+        });
       }
-      if (EmailValidator(errorText: 'not email').isValid(word)) {
-        textSpans.add(
-          TextSpan(
-            text: word,
-            style: baseTextStyle.copyWith(color: Colors.blue),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                Pasteboard.writeText(word);
-                onEmail?.call(word);
-              },
-          ),
-        );
-        textSpans.add(
-          TextSpan(
-            text: lastChar.isNotEmpty ? '$lastChar ' : ' ',
-            style: baseTextStyle,
-          ),
-        );
-        continue;
-      }
-      if (word.startsWith('http://') || word.startsWith('https://')) {
-        textSpans.add(
-          TextSpan(
-            text: word,
-            style: baseTextStyle.copyWith(
-              color: Colors.blue,
-              decoration: TextDecoration.underline,
-            ),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                tryToLaunchUrl(word);
-              },
-          ),
-        );
-        textSpans.add(
-          TextSpan(
-            text: lastChar.isNotEmpty ? '$lastChar ' : ' ',
-            style: baseTextStyle,
-          ),
-        );
-        continue;
-      }
-      if (word.startsWith('0') &&
-          NumberOnlyValidator(errorText: '').isValid(word)) {
-        textSpans.add(
-          TextSpan(
-            text: word,
-            style: baseTextStyle.copyWith(color: Colors.blue),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                tryToLaunchUrl(word);
-              },
-          ),
-        );
-        textSpans.add(
-          TextSpan(
-            text: lastChar.isNotEmpty ? '$lastChar ' : ' ',
-            style: baseTextStyle,
-          ),
-        );
-        continue;
-      }
-      textSpans.add(TextSpan(text: '$word$lastChar ', style: baseTextStyle));
+      // add the break line character at the end of the paragraph
+      textSpans.add(const TextSpan(text: '\n'));
     }
     return RichText(text: TextSpan(children: textSpans));
   }
