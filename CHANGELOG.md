@@ -8,3 +8,7 @@
 ## 1.0.2
 * Fix linkable with multi character at the end of word, include break line character.
 * Bugs fixing (09/06/2023)
+
+## 2.0.0
+* change name of package to flutter_string_utils
+* Add some string utilities

@@ -1,12 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'constants.dart';
 import 'validators.dart';
 
-class FLTTextFunctions {
+class StringUtils {
   static const _baseStyle = TextStyle(fontSize: 14, color: Colors.black87);
 
   static tryToLaunchUrl(String rawUrl,
@@ -111,5 +113,32 @@ class FLTTextFunctions {
       textSpans.add(const TextSpan(text: '\n'));
     }
     return RichText(text: TextSpan(children: textSpans));
+  }
+
+  static String removeDiacritics(String inputString) {
+    final diacriticsMap = {};
+    final diacriticsRegExp = RegExp('[^\u0000-\u007E]', multiLine: true);
+    if (diacriticsMap.isEmpty) {
+      for (var i = 0; i < defaultDiacriticsRemovalap.length; i++) {
+        var letters = defaultDiacriticsRemovalap[i]['letters'];
+        for (var j = 0; j < letters!.length; j++) {
+          diacriticsMap[letters[j]] = defaultDiacriticsRemovalap[i]['base'];
+        }
+      }
+    }
+    return inputString.replaceAllMapped(diacriticsRegExp, (a) {
+      return diacriticsMap[a.group(0)] ?? a.group(0);
+    });
+  }
+
+  static String? convertToCurrencyString(dynamic number, {NumberFormat? oCcy}) {
+    if (number is num) {
+      return (oCcy ?? NumberFormat("#,##0", "en_US")).format(number);
+    } else if (number is String) {
+      return (oCcy ?? NumberFormat("#,##0", "en_US"))
+          .format(num.tryParse(number));
+    } else {
+      return null;
+    }
   }
 }

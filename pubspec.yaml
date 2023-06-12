@@ -1,6 +1,6 @@
-name: flutter_linkable_text
-description: A Flutter package to convert normal Text widget to RichText widget with links, email address and phone numbers.
-version: 1.0.2
+name: flutter_string_utils
+description: A Flutter package contains string utility functions.
+version: 2.0.0
 homepage: https://github.com/kent2508/flutter_linkable_text
 
 environment:
@@ -13,6 +13,7 @@ dependencies:
 
   pasteboard: ^0.2.0
   url_launcher: ^6.1.11
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
